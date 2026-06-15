@@ -44,15 +44,14 @@ export function accountNameToInternalEmail(accountName: string): string {
   const domain =
     clean(import.meta.env.VITE_BROSSF_INTERNAL_EMAIL_DOMAIN) ||
     DEFAULT_INTERNAL_EMAIL_DOMAIN;
-  const localPart = accountName
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  const normalized = accountName.trim().toLowerCase();
+  const encoded = [...new TextEncoder().encode(normalized)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 
-  if (!localPart) {
+  if (!encoded) {
     throw new Error("Account name cannot be converted to an internal email.");
   }
 
-  return `${localPart}@${domain}`;
+  return `u-${encoded}@${domain}`;
 }

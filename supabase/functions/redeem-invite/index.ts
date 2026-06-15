@@ -20,14 +20,13 @@ function json(body: unknown, status = 200): Response {
 function toInternalEmail(accountName: string): string {
   const domain = Deno.env.get("BROSSF_INTERNAL_EMAIL_DOMAIN") ||
     "brossf.local.invalid";
-  const localPart = accountName
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  const normalized = accountName.trim().toLowerCase();
+  const localPart = [...new TextEncoder().encode(normalized)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 
   if (!localPart) throw new Error("Invalid invite account name.");
-  return `${localPart}@${domain}`;
+  return `u-${localPart}@${domain}`;
 }
 
 async function sha256Hex(value: string): Promise<string> {

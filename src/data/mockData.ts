@@ -137,8 +137,8 @@ export const ascendancyOptions: AscendancyOption[] = [
 export const players: Player[] = [
   {
     id: "sasha",
-    accountName: "Sasha",
-    initials: "SW",
+    accountName: "Сашенька",
+    initials: "СА",
     activeBuildId: "big-monke",
     builds: [
       {
@@ -151,8 +151,8 @@ export const players: Player[] = [
   },
   {
     id: "pasha",
-    accountName: "Pasha",
-    initials: "SW",
+    accountName: "Пашенька",
+    initials: "ПА",
     activeBuildId: "stormweaver-main",
     builds: [
       {
@@ -164,79 +164,51 @@ export const players: Player[] = [
     ],
   },
   {
-    id: "dima",
-    accountName: "Dima",
-    initials: "IF",
+    id: "denis",
+    accountName: "Дениска",
+    initials: "ДЕ",
     activeBuildId: "infernalist-main",
     builds: [
       {
         id: "infernalist-main",
-        characterName: "Dimon",
+        characterName: "Deniska",
         buildName: "Infernalist",
         ascendancyId: "infernalist",
       },
     ],
   },
   {
-    id: "maks",
-    accountName: "Maks",
-    initials: "TT",
+    id: "slava",
+    accountName: "Славочка",
+    initials: "СЛ",
     activeBuildId: "titan-slam",
     builds: [
       {
         id: "titan-slam",
-        characterName: "Makslam",
+        characterName: "Slavochka",
         buildName: "Titan Slam",
         ascendancyId: "titan",
       },
     ],
   },
   {
-    id: "oleg",
-    accountName: "Oleg",
-    initials: "DD",
+    id: "vanya",
+    accountName: "Ванечка",
+    initials: "ВА",
     activeBuildId: "deadeye-barrage",
     builds: [
       {
         id: "deadeye-barrage",
-        characterName: "OlegShot",
+        characterName: "Vanechka",
         buildName: "Deadeye Barrage",
         ascendancyId: "deadeye",
-      },
-    ],
-  },
-  {
-    id: "nikita",
-    accountName: "Nikita",
-    initials: "LC",
-    activeBuildId: "lich-choir",
-    builds: [
-      {
-        id: "lich-choir",
-        characterName: "NikLich",
-        buildName: "Lich Choir",
-        ascendancyId: "lich",
-      },
-    ],
-  },
-  {
-    id: "roma",
-    accountName: "Roma",
-    initials: "GL",
-    activeBuildId: "gemling-grenades",
-    builds: [
-      {
-        id: "gemling-grenades",
-        characterName: "RomaNades",
-        buildName: "Gemling Grenades",
-        ascendancyId: "gemling-legionnaire",
       },
     ],
   },
 ];
 
 export const initialClaims: ClaimState = {
-  tyranny: ["pasha", "dima", "maks", "nikita"],
+  tyranny: ["pasha", "denis", "slava"],
 };
 
 export const wishes: Wish[] = [
@@ -303,7 +275,7 @@ export const wishes: Wish[] = [
   },
   {
     id: "tyranny",
-    ownerId: "maks",
+    ownerId: "slava",
     buildId: "titan-slam",
     name: "Tyranny's Grip",
     baseType: "Ironhead Spear",
@@ -328,7 +300,7 @@ export const wishes: Wish[] = [
   },
   {
     id: "masterwork-rune",
-    ownerId: "oleg",
+    ownerId: "vanya",
     buildId: "deadeye-barrage",
     name: "Masterwork Rune",
     baseType: "Rune",
@@ -390,8 +362,8 @@ export const wishes: Wish[] = [
   },
   {
     id: "precursor-tablet",
-    ownerId: "roma",
-    buildId: "gemling-grenades",
+    ownerId: "vanya",
+    buildId: "deadeye-barrage",
     name: "Precursor Tablet",
     baseType: "Irradiated Tablet",
     kind: "tablet",
@@ -409,7 +381,7 @@ export const wishes: Wish[] = [
   },
   {
     id: "stellar-amulet",
-    ownerId: "dima",
+    ownerId: "denis",
     buildId: "infernalist-main",
     name: "Stellar Amulet",
     baseType: "Rare Template",
@@ -429,8 +401,8 @@ export const wishes: Wish[] = [
   },
   {
     id: "rattling-sceptre",
-    ownerId: "nikita",
-    buildId: "lich-choir",
+    ownerId: "pasha",
+    buildId: "stormweaver-main",
     name: "Rattling Sceptre",
     baseType: "Rare Template",
     kind: "rare",

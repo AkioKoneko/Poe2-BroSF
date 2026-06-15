@@ -24,7 +24,7 @@ export function AuthGate({
   error: externalError,
 }: AuthGateProps) {
   const [mode, setMode] = useState<AuthMode>("login");
-  const [accountName, setAccountName] = useState("Sasha");
+  const [accountName, setAccountName] = useState("Сашенька");
   const [password, setPassword] = useState("");
   const [inviteToken, setInviteToken] = useState(getInitialInviteToken);
   const [error, setError] = useState("");
@@ -72,7 +72,7 @@ export function AuthGate({
                 autoComplete="username"
                 value={accountName}
                 onChange={(event) => setAccountName(event.target.value)}
-                placeholder="Sasha"
+                placeholder="Сашенька"
               />
             </label>
             <label>
@@ -103,7 +103,7 @@ export function AuthGate({
           <form className="auth-form" onSubmit={submitInvite}>
             <div className="locked-account">
               <span>Invite</span>
-              <strong>{mockMode ? "Pasha" : "BROSF account"}</strong>
+              <strong>{mockMode ? "Пашенька" : "BROSF account"}</strong>
             </div>
             {!mockMode ? (
               <label>
