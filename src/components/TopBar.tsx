@@ -6,6 +6,7 @@ interface TopBarProps {
   currentAscendancy?: AscendancyOption;
   wishCount: number;
   onAdd: () => void;
+  onDonorBoard: () => void;
   onProfile: () => void;
   onLogout: () => void;
 }
@@ -15,6 +16,7 @@ export function TopBar({
   currentAscendancy,
   wishCount,
   onAdd,
+  onDonorBoard,
   onProfile,
   onLogout,
 }: TopBarProps) {
@@ -30,6 +32,13 @@ export function TopBar({
       <div className="topbar-actions">
         <button className="primary-action compact" onClick={onAdd} type="button">
           + Add wish
+        </button>
+        <button
+          className="ghost-button compact donor-top-button"
+          onClick={onDonorBoard}
+          type="button"
+        >
+          Donor board
         </button>
         <button className="profile-chip" onClick={onProfile} type="button">
           <span className="asc-icon">

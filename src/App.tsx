@@ -380,6 +380,7 @@ export default function App() {
         currentAscendancy={currentAscendancy}
         wishCount={wishList.filter((wish) => !wish.fulfilledAt).length}
         onAdd={openAddWish}
+        onDonorBoard={() => setDonorBoardOpen(true)}
         onProfile={() => setProfileOpen(true)}
         onLogout={logout}
       />
@@ -396,18 +397,6 @@ export default function App() {
             onClearBuilds={() => setActiveBuildIds([])}
           />
           <div className="board-tools">
-            <div className="donor-toggle-row">
-              <button
-                className="ghost-button donor-toggle"
-                onClick={() => setDonorBoardOpen((open) => !open)}
-                type="button"
-              >
-                {donorBoardOpen ? "Hide donor board" : "Donor board"}
-              </button>
-            </div>
-            {donorBoardOpen ? (
-              <DonorStats players={playerList} donationCounts={donationCounts} />
-            ) : null}
             <BoardControls
               search={search}
               sort={sortMode}
@@ -528,6 +517,14 @@ export default function App() {
           ascendancies={ascendancyOptions}
           onClose={() => setProfileOpen(false)}
           onSave={saveProfile}
+        />
+      ) : null}
+
+      {donorBoardOpen ? (
+        <DonorStats
+          players={playerList}
+          donationCounts={donationCounts}
+          onClose={() => setDonorBoardOpen(false)}
         />
       ) : null}
     </div>
