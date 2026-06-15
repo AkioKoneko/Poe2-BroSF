@@ -77,7 +77,13 @@ function normalizePoe2dbUrl(input: string): string {
 function parseKind(html: string): string {
   if (html.includes("UniquePopup")) return "unique";
   if (html.includes("CurrencyPopup")) return "currency";
-  if (html.includes("GemPopup")) return "gem";
+  if (html.includes("GemPopup")) {
+    const typeLine = matchFirst(
+      html,
+      /<div class="itemName typeLine">\s*<span class="lc">([\s\S]*?)<\/span>\s*<\/div>/i,
+    );
+    return /\bSupport\b/i.test(textFromHtml(typeLine)) ? "support" : "gem";
+  }
   if (/Tablet/i.test(html)) return "tablet";
   return "unique";
 }

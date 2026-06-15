@@ -216,17 +216,17 @@ export default function App() {
     setAddOpen(true);
   }
 
-  async function saveWish(draft: DraftWish) {
+  async function saveWish(draft: DraftWish, buildId: string) {
     if (useRemoteData) {
       await runRemote(() =>
-        addRemoteWish(draft, currentPlayer.id, currentBuild.id, wishList.length + 1),
+        addRemoteWish(draft, currentPlayer.id, buildId, wishList.length + 1),
       );
       setAddOpen(false);
       return;
     }
 
     setWishList((current) => [
-      createWishFromDraft(draft, currentPlayer.id, currentBuild.id, current.length + 1),
+      createWishFromDraft(draft, currentPlayer.id, buildId, current.length + 1),
       ...current,
     ]);
     setAddOpen(false);
@@ -238,11 +238,11 @@ export default function App() {
     setEditingWishId(wishId);
   }
 
-  async function saveEditedWish(draft: DraftWish) {
+  async function saveEditedWish(draft: DraftWish, buildId: string) {
     if (!editingWish) return;
 
     if (useRemoteData) {
-      await runRemote(() => updateRemoteWish(editingWish, draft));
+      await runRemote(() => updateRemoteWish(editingWish, draft, buildId));
       setEditingWishId(null);
       return;
     }
@@ -250,7 +250,7 @@ export default function App() {
     setWishList((current) =>
       current.map((wish) =>
         wish.id === editingWish.id && wish.ownerId === currentPlayer.id
-          ? applyDraftToWish(wish, draft)
+          ? applyDraftToWish(wish, draft, buildId)
           : wish,
       ),
     );
@@ -422,12 +422,19 @@ export default function App() {
       ) : null}
 
       {addOpen ? (
-        <AddWishModal onClose={() => setAddOpen(false)} onSave={saveWish} />
+        <AddWishModal
+          builds={currentPlayer.builds}
+          initialBuildId={currentBuild.id}
+          onClose={() => setAddOpen(false)}
+          onSave={saveWish}
+        />
       ) : null}
 
       {editingWish ? (
         <AddWishModal
           key={editingWish.id}
+          builds={currentPlayer.builds}
+          initialBuildId={editingWish.buildId}
           initialWish={editingWish}
           onClose={() => setEditingWishId(null)}
           onSave={saveEditedWish}

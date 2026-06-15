@@ -70,6 +70,7 @@ export type Poe2dbSyncResult = Partial<
   Pick<
     DraftWish,
     | "kind"
+    | "gemFlavor"
     | "name"
     | "baseType"
     | "sourceUrl"
@@ -269,6 +270,7 @@ export async function syncPoe2dbItem(sourceUrl: string): Promise<Poe2dbSyncResul
 
   const synced = data as {
     kind?: DraftWish["kind"] | "support";
+    gemFlavor?: DraftWish["gemFlavor"];
     name?: string;
     baseType?: string;
     sourceUrl?: string;
@@ -286,6 +288,8 @@ export async function syncPoe2dbItem(sourceUrl: string): Promise<Poe2dbSyncResul
 
   return {
     kind: synced.kind === "support" ? "gem" : synced.kind,
+    gemFlavor:
+      synced.kind === "support" ? "support" : synced.kind === "gem" ? "skill" : undefined,
     name: synced.name,
     baseType: synced.baseType ?? "",
     sourceUrl: synced.sourceUrl ?? sourceUrl,
@@ -396,8 +400,9 @@ export async function addRemoteWish(
 export async function updateRemoteWish(
   existing: Wish,
   draft: DraftWish,
+  buildId = existing.buildId,
 ): Promise<BoardData> {
-  const wish = applyDraftToWish(existing, draft);
+  const wish = applyDraftToWish(existing, draft, buildId);
   const { error } = await getSupabaseClient()
     .from("wishes")
     .update(fromWishForInsert(wish))

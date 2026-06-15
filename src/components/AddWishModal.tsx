@@ -1,11 +1,13 @@
 import { FormEvent, MouseEvent, useRef, useState } from "react";
-import type { DraftWish, Wish, WishPriority } from "../types";
+import type { BuildProfile, DraftWish, Wish, WishPriority } from "../types";
 import { syncPoe2dbItem } from "../lib/brossfRepository";
 import { draftFromWish } from "../utils/wishlist";
 
 interface AddWishModalProps {
   onClose: () => void;
-  onSave: (draft: DraftWish) => void | Promise<void>;
+  onSave: (draft: DraftWish, buildId: string) => void | Promise<void>;
+  builds: BuildProfile[];
+  initialBuildId: string;
   initialWish?: Wish;
 }
 
@@ -46,10 +48,15 @@ const priorityOptions: WishPriority[] = ["low", "normal", "high", "urgent"];
 export function AddWishModal({
   onClose,
   onSave,
+  builds,
+  initialBuildId,
   initialWish,
 }: AddWishModalProps) {
   const [draft, setDraft] = useState<DraftWish>(() =>
     initialWish ? draftFromWish(initialWish) : draftDefaults,
+  );
+  const [selectedBuildId, setSelectedBuildId] = useState(
+    initialWish?.buildId || initialBuildId || builds[0]?.id || "",
   );
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState("");
@@ -62,7 +69,7 @@ export function AddWishModal({
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSave(draft);
+    onSave(draft, selectedBuildId || initialBuildId || builds[0]?.id || "");
   }
 
   async function syncFromPoe2db() {
@@ -150,6 +157,19 @@ export function AddWishModal({
         </div>
 
         <div className="form-grid">
+          <label className="wide-field">
+            Build
+            <select
+              value={selectedBuildId}
+              onChange={(event) => setSelectedBuildId(event.target.value)}
+            >
+              {builds.map((build) => (
+                <option key={build.id} value={build.id}>
+                  {build.buildName} / {build.characterName}
+                </option>
+              ))}
+            </select>
+          </label>
           <label>
             {showRare ? "Template name or base" : showPack ? "Pack name" : "Item name"}
             <input

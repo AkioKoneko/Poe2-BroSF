@@ -234,7 +234,8 @@ export function toggleClaim(
 }
 
 function resolveDraftKind(draft: DraftWish): WishKind {
-  return (draft.kind === "gem" ? draft.gemFlavor : draft.kind) as WishKind;
+  if (draft.kind !== "gem") return draft.kind as WishKind;
+  return draft.gemFlavor === "support" ? "support" : "gem";
 }
 
 function splitDraftLines(value: string): string[] {
@@ -325,12 +326,17 @@ export function draftFromWish(wish: Wish): DraftWish {
   };
 }
 
-export function applyDraftToWish(wish: Wish, draft: DraftWish): Wish {
+export function applyDraftToWish(
+  wish: Wish,
+  draft: DraftWish,
+  buildId = wish.buildId,
+): Wish {
   const kind = resolveDraftKind(draft);
   const nextIcon = wish.kind === kind ? wish.icon : getFallbackIcon(kind);
 
   return {
     ...wish,
+    buildId,
     name: getDraftName(draft),
     baseType: getDraftBaseType(draft, kind),
     kind,
