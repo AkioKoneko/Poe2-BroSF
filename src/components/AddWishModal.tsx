@@ -38,6 +38,7 @@ const kindTabs: { value: DraftWish["kind"]; label: string }[] = [
   { value: "tablet", label: "Tablet" },
   { value: "gem", label: "Gem" },
   { value: "rare", label: "Rare template" },
+  { value: "pack", label: "Craft pack" },
 ];
 
 const priorityOptions: WishPriority[] = ["low", "normal", "high", "urgent"];
@@ -91,6 +92,7 @@ export function AddWishModal({
 
   const showQuantity = draft.kind === "currency" || draft.kind === "tablet";
   const showRare = draft.kind === "rare";
+  const showPack = draft.kind === "pack";
   const showTablet = draft.kind === "tablet";
 
   return (
@@ -136,11 +138,17 @@ export function AddWishModal({
 
         <div className="form-grid">
           <label>
-            {showRare ? "Template name or base" : "Item name"}
+            {showRare ? "Template name or base" : showPack ? "Pack name" : "Item name"}
             <input
               value={draft.name}
               onChange={(event) => update("name", event.target.value)}
-              placeholder={showRare ? "Generic minion amulet" : "Forgotten Warden"}
+              placeholder={
+                showRare
+                  ? "Lute amulet"
+                  : showPack
+                    ? "Idol craft pack"
+                    : "Forgotten Warden"
+              }
             />
           </label>
           <label>
@@ -218,13 +226,17 @@ export function AddWishModal({
               placeholder="Drops from The Bodach, Ritual pinnacle boss"
             />
           </label>
-          {showTablet ? (
+          {showTablet || showPack ? (
             <label className="wide-field">
-              Desired tablet properties
+              {showPack ? "Pack contents" : "Desired tablet properties"}
               <textarea
                 value={draft.desiredMods}
                 onChange={(event) => update("desiredMods", event.target.value)}
-                placeholder="Unique Monsters have one additional Rare Modifier"
+                placeholder={
+                  showPack
+                    ? "Fox Idol\nPrimate Idol\nCarved Majesty"
+                    : "Unique Monsters have one additional Rare Modifier"
+                }
               />
             </label>
           ) : null}

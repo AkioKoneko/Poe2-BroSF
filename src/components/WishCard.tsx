@@ -46,6 +46,12 @@ export function WishCard({
   const ownerBuild = getWishBuild(wish, owner);
   const ownerAscendancy = ascendanciesById.get(ownerBuild.ascendancyId);
   const cardTexts = getWishCardTexts(wish);
+  const placeholder =
+    wish.kind === "pack"
+      ? { title: "Pack", subtitle: "Craft" }
+      : wish.kind === "rare"
+        ? { title: "Rare", subtitle: "Template" }
+        : { title: kindLabel[wish.kind], subtitle: "Wish" };
 
   function stopAction(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
@@ -70,8 +76,8 @@ export function WishCard({
           <img src={wish.icon} alt={wish.name} loading="lazy" />
         ) : (
           <div className="rare-placeholder" aria-hidden="true">
-            <span>Rare</span>
-            <small>Template</small>
+            <span>{placeholder.title}</span>
+            <small>{placeholder.subtitle}</small>
           </div>
         )}
         <span className={`priority-rune priority-${wish.priority}`}>

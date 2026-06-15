@@ -28,7 +28,8 @@ export type WishKind =
   | "gem"
   | "support"
   | "tablet"
-  | "rare";
+  | "rare"
+  | "pack";
 
 export type WishPriority = "low" | "normal" | "high" | "urgent";
 
@@ -96,7 +97,7 @@ export interface Wish {
 export type ClaimState = Record<string, UserId[]>;
 
 export interface DraftWish {
-  kind: "unique" | "currency" | "tablet" | "gem" | "rare";
+  kind: "unique" | "currency" | "tablet" | "gem" | "rare" | "pack";
   gemFlavor: "skill" | "support";
   name: string;
   baseType: string;

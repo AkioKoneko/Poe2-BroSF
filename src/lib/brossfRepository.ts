@@ -107,7 +107,8 @@ function asKind(value: string): WishKind {
     value === "gem" ||
     value === "support" ||
     value === "tablet" ||
-    value === "rare"
+    value === "rare" ||
+    value === "pack"
   ) {
     return value;
   }

@@ -26,6 +26,7 @@ export const kindLabel: Record<WishKind, string> = {
   support: "Support",
   tablet: "Tablet",
   rare: "Rare template",
+  pack: "Craft pack",
 };
 
 export function buildAscendancyMap(
@@ -193,7 +194,12 @@ export function getWishCardTexts(wish: Wish): WishCardTextBlock[] {
     blocks.push({ label: "Must-have", text: mustHave, tone: "wanted" });
   } else if (desired) {
     blocks.push({
-      label: wish.kind === "tablet" ? "Tablet props" : "Wanted",
+      label:
+        wish.kind === "tablet"
+          ? "Tablet props"
+          : wish.kind === "pack"
+            ? "Pack includes"
+            : "Wanted",
       text: desired,
       tone: "wanted",
     });
@@ -288,6 +294,7 @@ function getDraftBaseType(draft: DraftWish, kind: WishKind): string {
     return kind === "support" ? "Support Gem" : "Skill Gem";
   }
   if (draft.kind === "currency") return "Currency / Rune";
+  if (draft.kind === "pack") return "Grouped Wishlist Pack";
   return "Catalog Item";
 }
 

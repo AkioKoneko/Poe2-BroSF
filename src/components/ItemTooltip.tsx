@@ -83,6 +83,12 @@ export function ItemTooltip({
 }: ItemTooltipProps) {
   const claimers = getClaimers(claims, wish.id);
   const ownerBuild = getWishBuild(wish, owner);
+  const placeholder =
+    wish.kind === "pack"
+      ? { title: "Pack", subtitle: "Craft" }
+      : wish.kind === "rare"
+        ? { title: "Rare", subtitle: "Template" }
+        : { title: kindLabel[wish.kind], subtitle: "Wish" };
   const claimedBy = claimers
     .map((id) => playersById.get(id)?.accountName)
     .filter(Boolean)
@@ -95,8 +101,8 @@ export function ItemTooltip({
           <img src={wish.icon} alt="" loading="lazy" />
         ) : (
           <div className="rare-placeholder tip-placeholder" aria-hidden="true">
-            <span>Rare</span>
-            <small>Template</small>
+            <span>{placeholder.title}</span>
+            <small>{placeholder.subtitle}</small>
           </div>
         )}
       </div>
@@ -141,7 +147,10 @@ export function ItemTooltip({
           </div>
         ) : null}
 
-        <AffixList title="Desired tablet properties" lines={wish.desiredMods} />
+        <AffixList
+          title={wish.kind === "pack" ? "Pack contents" : "Desired tablet properties"}
+          lines={wish.desiredMods}
+        />
         <AffixList title="Must-have affixes" lines={wish.mustHaveAffixes} />
         <AffixList title="Nice-to-have affixes" lines={wish.niceAffixes} />
 
