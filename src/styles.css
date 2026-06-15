@@ -957,6 +957,18 @@ label span {
   letter-spacing: 0.2px;
 }
 
+.roll-value {
+  color: #f4f0e4;
+  font-weight: 700;
+  font-variant: normal;
+}
+
+.poe-term {
+  color: #6f84ff;
+  text-decoration: underline dotted rgba(143, 155, 255, 0.54);
+  text-underline-offset: 2px;
+}
+
 .tip-subtitle {
   margin-bottom: 3px;
   color: var(--gold);
@@ -1048,15 +1060,15 @@ label span {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: min(540px, 100%);
-  max-height: min(880px, calc(100vh - 52px));
+  width: min(620px, 100%);
+  max-height: min(1144px, calc(100vh - 28px));
   overflow: hidden;
 }
 
 .detail-modal .item-tooltip {
   flex: 1 1 auto;
   min-height: 0;
-  max-height: calc(100vh - 112px);
+  max-height: calc(100vh - 88px);
 }
 
 .detail-modal .tip-art {

@@ -14,12 +14,48 @@ interface ItemTooltipProps {
   playersById: Map<UserId, Player>;
 }
 
+const richTermPattern =
+  /\b(Allies|Attributes|Companions|Discipline|Life|Marked|Presence|Spirit)\b/g;
+const rollPattern = /(\+?\(\d+[-–—]\d+\)%?|\+\d+|\b\d+%?\b)/g;
+
+function RichText({ text }: { text: string }) {
+  const parts = text.split(/(\+?\(\d+[-–—]\d+\)%?|\+\d+|\b\d+%?\b|\bAllies\b|\bAttributes\b|\bCompanions\b|\bDiscipline\b|\bLife\b|\bMarked\b|\bPresence\b|\bSpirit\b)/g);
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (!part) return null;
+        if (rollPattern.test(part)) {
+          rollPattern.lastIndex = 0;
+          return (
+            <span className="roll-value" key={`${part}-${index}`}>
+              {part}
+            </span>
+          );
+        }
+        rollPattern.lastIndex = 0;
+        if (richTermPattern.test(part)) {
+          richTermPattern.lastIndex = 0;
+          return (
+            <span className="poe-term" key={`${part}-${index}`}>
+              {part}
+            </span>
+          );
+        }
+        richTermPattern.lastIndex = 0;
+        return part;
+      })}
+    </>
+  );
+}
+
 function Lines({ lines }: { lines?: string[] }) {
   if (!lines?.length) return null;
   return (
     <div className="tip-section">
       {lines.map((line) => (
-        <div key={line}>{line}</div>
+        <div key={line}>
+          <RichText text={line} />
+        </div>
       ))}
     </div>
   );
@@ -32,7 +68,7 @@ function AffixList({ title, lines }: { title: string; lines?: string[] }) {
       <div className="tip-subtitle">{title}</div>
       {lines.map((line) => (
         <div className="mod-line" key={line}>
-          {line}
+          <RichText text={line} />
         </div>
       ))}
     </div>
@@ -77,7 +113,9 @@ export function ItemTooltip({
             {wish.properties.map((property) => (
               <div className="property-line" key={property.label}>
                 <span>{property.label}: </span>
-                <strong>{property.value}</strong>
+                <strong>
+                  <RichText text={property.value} />
+                </strong>
               </div>
             ))}
           </div>
@@ -97,7 +135,7 @@ export function ItemTooltip({
           <div className="tip-section">
             {wish.explicitMods.map((line) => (
               <div className="mod-line" key={line}>
-                {line}
+                <RichText text={line} />
               </div>
             ))}
           </div>

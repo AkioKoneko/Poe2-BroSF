@@ -267,12 +267,20 @@ export const wishes: Wish[] = [
     icon: `${iconBase}sylvans-effigy.webp`,
     sourceUrl: "https://poe2db.tw/us/Sylvans_Effigy",
     dropSource: "Drops from The Bodach, Ritual pinnacle boss",
+    metaLines: ["Sceptres"],
     requirements: ["Requires Level 62, 7 Str, 12 Int"],
-    properties: [{ label: "Spirit", value: "(50-75)% increased" }],
+    properties: [{ label: "Spirit", value: "100" }],
     explicitMods: [
       "Grants Skill: Discipline",
       "Grants Skill: Level 14 Azmerian Wolf",
-      "Allies in your Presence Regenerate Life per second",
+      "(50—75)% increased Spirit",
+      "Allies in your Presence Regenerate (50—100) Life per second",
+      "+(6—12) to all Attributes",
+      "Companions deal (50—100)% increased damage to your Marked targets",
+      "You can have any number of Companions of different types",
+    ],
+    flavourLines: [
+      "Darkness howls through ancient bones, a wistful cry on hollow winds. The moon listens. The pack gathers.",
     ],
   },
   {
