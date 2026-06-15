@@ -92,6 +92,8 @@ export interface Wish {
   niceAffixes?: string[];
   flavourLines?: string[];
   footerLine?: string;
+  fulfilledBy?: UserId;
+  fulfilledAt?: string;
 }
 
 export type ClaimState = Record<string, UserId[]>;

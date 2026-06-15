@@ -1,6 +1,6 @@
 import { MouseEvent, useEffect, useRef } from "react";
 import type { ClaimState, Player, UserId, Wish } from "../types";
-import { isClaimedBy } from "../utils/wishlist";
+import { getClaimers, isClaimedBy } from "../utils/wishlist";
 import { ItemTooltip } from "./ItemTooltip";
 
 interface DetailModalProps {
@@ -13,6 +13,7 @@ interface DetailModalProps {
   onToggleClaim: (wishId: string) => void;
   onEdit: (wishId: string) => void;
   onDelete: (wishId: string) => void;
+  onFulfill: (wishId: string, donorId: UserId) => void;
 }
 
 export function DetailModal({
@@ -25,9 +26,14 @@ export function DetailModal({
   onToggleClaim,
   onEdit,
   onDelete,
+  onFulfill,
 }: DetailModalProps) {
   const isOwner = wish.ownerId === currentUserId;
   const claimedByMe = isClaimedBy(claims, wish.id, currentUserId);
+  const claimers = getClaimers(claims, wish.id);
+  const fulfilledBy = wish.fulfilledBy
+    ? playersById.get(wish.fulfilledBy)?.accountName ?? wish.fulfilledBy
+    : "";
   const backdropPointerStarted = useRef(false);
 
   useEffect(() => {
@@ -69,7 +75,9 @@ export function DetailModal({
           playersById={playersById}
         />
         <div className={isOwner ? "modal-actions owner-actions" : "modal-actions"}>
-          {!isOwner ? (
+          {wish.fulfilledAt ? (
+            <span className="fulfilled-detail">ЗАБРАНО: {fulfilledBy}</span>
+          ) : !isOwner ? (
             <button
               className={claimedByMe ? "claim-button active wide" : "claim-button wide"}
               onClick={() => onToggleClaim(wish.id)}
@@ -79,6 +87,20 @@ export function DetailModal({
             </button>
           ) : (
             <>
+              {claimers.length ? (
+                <div className="take-actions">
+                  {claimers.map((claimerId) => (
+                    <button
+                      className="take-button wide"
+                      key={claimerId}
+                      onClick={() => onFulfill(wish.id, claimerId)}
+                      type="button"
+                    >
+                      ЗАБРАЛ у {playersById.get(claimerId)?.accountName ?? claimerId}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               <button
                 className="ghost-button wide"
                 onClick={() => onEdit(wish.id)}

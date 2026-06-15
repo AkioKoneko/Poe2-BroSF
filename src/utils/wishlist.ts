@@ -82,7 +82,17 @@ export function getPlayerWishCounts(wishes: Wish[]): Map<UserId, number> {
 export function getBuildWishCounts(wishes: Wish[]): Map<string, number> {
   const counts = new Map<string, number>();
   for (const wish of wishes) {
+    if (wish.fulfilledAt) continue;
     counts.set(wish.buildId, (counts.get(wish.buildId) ?? 0) + 1);
+  }
+  return counts;
+}
+
+export function getDonationCounts(wishes: Wish[]): Map<UserId, number> {
+  const counts = new Map<UserId, number>();
+  for (const wish of wishes) {
+    if (!wish.fulfilledBy) continue;
+    counts.set(wish.fulfilledBy, (counts.get(wish.fulfilledBy) ?? 0) + 1);
   }
   return counts;
 }
@@ -107,6 +117,8 @@ export function sortWishes(
 ): Wish[] {
   const list = [...wishes];
   const claimCount = (wish: Wish) => getClaimers(claims, wish.id).length;
+  const fulfilledTime = (wish: Wish) =>
+    wish.fulfilledAt ? Date.parse(wish.fulfilledAt) || 0 : 0;
   const playerName = (wish: Wish) => {
     const owner = playersById.get(wish.ownerId);
     const build = owner ? getWishBuild(wish, owner) : null;
@@ -127,6 +139,7 @@ export function sortWishes(
         return claimCount(a) - claimCount(b);
       case "newest":
       default:
+        if (a.fulfilledAt || b.fulfilledAt) return fulfilledTime(b) - fulfilledTime(a);
         return b.addedOrder - a.addedOrder;
     }
   });

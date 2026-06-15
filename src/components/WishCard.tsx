@@ -26,6 +26,7 @@ interface WishCardProps {
   onHover: (wishId: string, clientX: number, clientY: number) => void;
   onHoverEnd: () => void;
   onToggleClaim: (wishId: string) => void;
+  onFulfill: (wishId: string, donorId: UserId) => void;
 }
 
 export function WishCard({
@@ -39,10 +40,18 @@ export function WishCard({
   onHover,
   onHoverEnd,
   onToggleClaim,
+  onFulfill,
 }: WishCardProps) {
   const isOwner = wish.ownerId === currentUserId;
   const claimers = getClaimers(claims, wish.id);
   const claimedByMe = isClaimedBy(claims, wish.id, currentUserId);
+  const fulfilledBy = wish.fulfilledBy
+    ? playersById.get(wish.fulfilledBy)?.accountName ?? wish.fulfilledBy
+    : "";
+  const firstClaimerId = claimers[0];
+  const firstClaimer = firstClaimerId
+    ? playersById.get(firstClaimerId)?.accountName ?? firstClaimerId
+    : "";
   const ownerBuild = getWishBuild(wish, owner);
   const ownerAscendancy = ascendanciesById.get(ownerBuild.ascendancyId);
   const cardTexts = getWishCardTexts(wish);
@@ -59,7 +68,12 @@ export function WishCard({
 
   return (
     <article
-      className={`wish-card rarity-${wish.kind}`}
+      className={[
+        "wish-card",
+        `rarity-${wish.kind}`,
+        claimers.length && !wish.fulfilledAt ? "claimed-card" : "",
+        wish.fulfilledAt ? "fulfilled-card" : "",
+      ].filter(Boolean).join(" ")}
       onClick={() => onOpen(wish.id)}
       onMouseEnter={(event) =>
         onHover(wish.id, event.clientX, event.clientY)
@@ -83,6 +97,11 @@ export function WishCard({
         <span className={`priority-rune priority-${wish.priority}`}>
           {priorityLabel[wish.priority]}
         </span>
+        {wish.fulfilledAt ? (
+          <span className="availability-ribbon fulfilled">ЗАБРАНО: {fulfilledBy}</span>
+        ) : claimers.length ? (
+          <span className="availability-ribbon">В ГИЛЬДЕ: {firstClaimer}</span>
+        ) : null}
       </div>
       <div className="card-body">
         <div className="card-kicker">
@@ -116,15 +135,30 @@ export function WishCard({
         </span>
 
         {claimers.length ? (
-          <span className="claimers">
-            {claimers.map((id) => playersById.get(id)?.accountName ?? id).join(", ")}
+          <span className={wish.fulfilledAt ? "claimers fulfilled" : "claimers"}>
+            {wish.fulfilledAt
+              ? `Забрано: ${fulfilledBy}`
+              : claimers.map((id) => playersById.get(id)?.accountName ?? id).join(", ")}
           </span>
         ) : (
           <span className="unclaimed">No claim</span>
         )}
 
         <div className="card-actions">
-          {!isOwner ? (
+          {wish.fulfilledAt ? (
+            <span className="fulfilled-mark">ЗАБРАНО</span>
+          ) : isOwner && firstClaimerId ? (
+            <button
+              className="take-button"
+              type="button"
+              onClick={(event) => {
+                stopAction(event);
+                onFulfill(wish.id, firstClaimerId);
+              }}
+            >
+              ЗАБРАЛ
+            </button>
+          ) : !isOwner ? (
             <button
               className={claimedByMe ? "claim-button active" : "claim-button"}
               type="button"

@@ -209,6 +209,7 @@ export const players: Player[] = [
 
 export const initialClaims: ClaimState = {
   tyranny: ["pasha", "denis", "slava"],
+  "sasha-dunkelhalt": ["vanya"],
 };
 
 export const wishes: Wish[] = [
@@ -447,6 +448,8 @@ export const wishes: Wish[] = [
       "Strikes deal Splash Damage",
       "Knocks Back Enemies on Hit",
     ],
+    fulfilledBy: "pasha",
+    fulfilledAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: "masterwork-rune",

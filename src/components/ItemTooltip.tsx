@@ -93,6 +93,9 @@ export function ItemTooltip({
     .map((id) => playersById.get(id)?.accountName)
     .filter(Boolean)
     .join(", ");
+  const fulfilledBy = wish.fulfilledBy
+    ? playersById.get(wish.fulfilledBy)?.accountName ?? wish.fulfilledBy
+    : "";
 
   return (
     <article className={`item-tooltip rarity-${wish.kind}`}>
@@ -184,8 +187,8 @@ export function ItemTooltip({
             <strong>{priorityLabel[wish.priority]}</strong>
           </div>
           <div>
-            <span>Claim</span>
-            <strong>{claimedBy || "No one yet"}</strong>
+            <span>{wish.fulfilledAt ? "Taken" : "Claim"}</span>
+            <strong>{wish.fulfilledAt ? fulfilledBy : claimedBy || "No one yet"}</strong>
           </div>
           {wish.note ? (
             <p className="owner-note">

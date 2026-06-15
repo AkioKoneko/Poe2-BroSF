@@ -10,6 +10,7 @@ import { AddWishModal } from "./components/AddWishModal";
 import { AuthGate } from "./components/AuthGate";
 import { BoardControls } from "./components/BoardControls";
 import { DetailModal } from "./components/DetailModal";
+import { DonorStats } from "./components/DonorStats";
 import { ItemTooltip } from "./components/ItemTooltip";
 import { ProfileModal } from "./components/ProfileModal";
 import { Roster } from "./components/Roster";
@@ -25,6 +26,7 @@ import {
 import {
   addRemoteWish,
   deleteRemoteWish,
+  fulfillRemoteWish,
   loadBoardData,
   redeemInvite,
   saveRemoteProfile,
@@ -45,6 +47,7 @@ import {
   filterWishes,
   getActiveBuild,
   getBuildWishCounts,
+  getDonationCounts,
   isClaimedBy,
   sortWishes,
   toggleClaim,
@@ -95,7 +98,17 @@ export default function App() {
     return sortWishes(filtered, sortMode, claims, playersById);
   }, [activeBuildIds, claims, deferredSearch, playersById, sortMode, wishList]);
 
+  const openWishes = useMemo(
+    () => visibleWishes.filter((wish) => !wish.fulfilledAt),
+    [visibleWishes],
+  );
+  const fulfilledWishes = useMemo(
+    () => visibleWishes.filter((wish) => wish.fulfilledAt),
+    [visibleWishes],
+  );
+
   const counts = useMemo(() => getBuildWishCounts(wishList), [wishList]);
+  const donationCounts = useMemo(() => getDonationCounts(wishList), [wishList]);
   const hoveredWish = useMemo(
     () => wishList.find((wish) => wish.id === hover?.id) ?? null,
     [hover?.id, wishList],
@@ -273,6 +286,9 @@ export default function App() {
   }
 
   async function toggleWishClaim(wishId: string) {
+    const wish = wishList.find((candidate) => candidate.id === wishId);
+    if (wish?.fulfilledAt) return;
+
     if (useRemoteData) {
       await runRemote(() =>
         setRemoteClaim(
@@ -285,6 +301,27 @@ export default function App() {
     }
 
     setClaims((current) => toggleClaim(current, wishId, currentPlayer.id));
+  }
+
+  async function fulfillWish(wishId: string, donorId: UserId) {
+    if (useRemoteData) {
+      await runRemote(() => fulfillRemoteWish(wishId, donorId));
+      setDetailId(null);
+      return;
+    }
+
+    setWishList((current) =>
+      current.map((wish) =>
+        wish.id === wishId && wish.ownerId === currentPlayer.id
+          ? {
+              ...wish,
+              fulfilledBy: donorId,
+              fulfilledAt: new Date().toISOString(),
+            }
+          : wish,
+      ),
+    );
+    setDetailId(null);
   }
 
   function toggleBuildFilter(buildId: string) {
@@ -340,7 +377,7 @@ export default function App() {
       <TopBar
         currentPlayer={currentPlayer}
         currentAscendancy={currentAscendancy}
-        wishCount={wishList.length}
+        wishCount={wishList.filter((wish) => !wish.fulfilledAt).length}
         onAdd={openAddWish}
         onProfile={() => setProfileOpen(true)}
         onLogout={logout}
@@ -357,6 +394,7 @@ export default function App() {
             onToggleBuild={toggleBuildFilter}
             onClearBuilds={() => setActiveBuildIds([])}
           />
+          <DonorStats players={playerList} donationCounts={donationCounts} />
           <BoardControls
             search={search}
             sort={sortMode}
@@ -365,9 +403,9 @@ export default function App() {
           />
 
           <div className="showcase-scroll">
-            {visibleWishes.length ? (
+            {openWishes.length ? (
               <div className="wish-grid">
-                {visibleWishes.map((wish) => {
+                {openWishes.map((wish) => {
                   const owner = playersById.get(wish.ownerId) ?? playerList[0];
                   return (
                     <WishCard
@@ -382,6 +420,7 @@ export default function App() {
                       onHover={(id, x, y) => setHover({ id, x, y })}
                       onHoverEnd={() => setHover(null)}
                       onToggleClaim={toggleWishClaim}
+                      onFulfill={fulfillWish}
                     />
                   );
                 })}
@@ -392,6 +431,35 @@ export default function App() {
                 <p>Try a shorter search, clear group filters, or add the first wish.</p>
               </div>
             )}
+            {fulfilledWishes.length ? (
+              <section className="fulfilled-section" aria-label="Fulfilled wishes">
+                <div className="section-title">
+                  <span>Claimed and taken</span>
+                  <small>auto-clean after about 14 days</small>
+                </div>
+                <div className="wish-grid fulfilled-grid">
+                  {fulfilledWishes.map((wish) => {
+                    const owner = playersById.get(wish.ownerId) ?? playerList[0];
+                    return (
+                      <WishCard
+                        key={wish.id}
+                        wish={wish}
+                        owner={owner}
+                        claims={claims}
+                        currentUserId={currentPlayer.id}
+                        playersById={playersById}
+                        ascendanciesById={ascendanciesById}
+                        onOpen={setDetailId}
+                        onHover={(id, x, y) => setHover({ id, x, y })}
+                        onHoverEnd={() => setHover(null)}
+                        onToggleClaim={toggleWishClaim}
+                        onFulfill={fulfillWish}
+                      />
+                    );
+                  })}
+                </div>
+              </section>
+            ) : null}
           </div>
         </section>
       </main>
@@ -418,6 +486,7 @@ export default function App() {
           onToggleClaim={toggleWishClaim}
           onEdit={openEditWish}
           onDelete={deleteWish}
+          onFulfill={fulfillWish}
         />
       ) : null}
 

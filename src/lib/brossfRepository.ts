@@ -52,6 +52,8 @@ interface WishRow {
   nice_affixes: string[];
   flavour_lines: string[];
   footer_line: string | null;
+  fulfilled_by?: string | null;
+  fulfilled_at?: string | null;
 }
 
 interface ClaimRow {
@@ -65,6 +67,8 @@ export interface BoardData {
   wishes: Wish[];
   claims: ClaimState;
 }
+
+const fulfilledRetentionDays = 14;
 
 export type Poe2dbSyncResult = Partial<
   Pick<
@@ -166,6 +170,8 @@ function toWish(row: WishRow): Wish {
     niceAffixes: row.nice_affixes,
     flavourLines: row.flavour_lines,
     footerLine: row.footer_line ?? undefined,
+    fulfilledBy: row.fulfilled_by ?? undefined,
+    fulfilledAt: row.fulfilled_at ?? undefined,
   };
 }
 
@@ -316,6 +322,8 @@ export async function loadBoardData(): Promise<BoardData> {
   const userId = userData.user?.id;
   if (!userId) throw new Error("No active Supabase session.");
 
+  await cleanupOwnOldFulfilledWishes(userId);
+
   const [profilesResult, buildsResult, wishesResult, claimsResult] =
     await Promise.all([
       supabase.from("profiles").select("*").order("account_name"),
@@ -346,6 +354,21 @@ export async function loadBoardData(): Promise<BoardData> {
     wishes: ((wishesResult.data ?? []) as WishRow[]).map(toWish),
     claims: toClaims((claimsResult.data ?? []) as ClaimRow[]),
   };
+}
+
+async function cleanupOwnOldFulfilledWishes(userId: UserId): Promise<void> {
+  const cutoff = new Date(
+    Date.now() - fulfilledRetentionDays * 24 * 60 * 60 * 1000,
+  ).toISOString();
+  const { error } = await getSupabaseClient()
+    .from("wishes")
+    .delete()
+    .eq("owner_id", userId)
+    .lt("fulfilled_at", cutoff);
+
+  if (error && !/fulfilled_at/i.test(error.message)) {
+    throw new Error(`Cleanup old fulfilled wishes failed: ${error.message}`);
+  }
 }
 
 export async function saveRemoteProfile(player: Player): Promise<BoardData> {
@@ -417,6 +440,21 @@ export async function deleteRemoteWish(wishId: string): Promise<BoardData> {
     .delete()
     .eq("id", wishId);
   assertNoError(error, "Delete wish failed");
+  return loadBoardData();
+}
+
+export async function fulfillRemoteWish(
+  wishId: string,
+  donorId: UserId,
+): Promise<BoardData> {
+  const { error } = await getSupabaseClient()
+    .from("wishes")
+    .update({
+      fulfilled_by: donorId,
+      fulfilled_at: new Date().toISOString(),
+    })
+    .eq("id", wishId);
+  assertNoError(error, "Mark wish fulfilled failed");
   return loadBoardData();
 }
 
