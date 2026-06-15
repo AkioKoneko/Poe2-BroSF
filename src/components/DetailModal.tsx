@@ -31,9 +31,6 @@ export function DetailModal({
   const isOwner = wish.ownerId === currentUserId;
   const claimedByMe = isClaimedBy(claims, wish.id, currentUserId);
   const claimers = getClaimers(claims, wish.id);
-  const fulfilledBy = wish.fulfilledBy
-    ? playersById.get(wish.fulfilledBy)?.accountName ?? wish.fulfilledBy
-    : "";
   const backdropPointerStarted = useRef(false);
 
   useEffect(() => {
@@ -76,7 +73,7 @@ export function DetailModal({
         />
         <div className={isOwner ? "modal-actions owner-actions" : "modal-actions"}>
           {wish.fulfilledAt ? (
-            <span className="fulfilled-detail">ЗАБРАНО: {fulfilledBy}</span>
+            <span className="fulfilled-detail">ЗАБРАНО</span>
           ) : !isOwner ? (
             <button
               className={claimedByMe ? "claim-button active wide" : "claim-button wide"}
