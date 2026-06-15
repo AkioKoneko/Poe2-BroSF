@@ -39,6 +39,7 @@ interface WishRow {
   added_order: number;
   quantity: number | null;
   source_url: string | null;
+  drop_source: string | null;
   icon: string | null;
   note: string | null;
   requirements: string[];
@@ -120,6 +121,7 @@ function toWish(row: WishRow): Wish {
     addedOrder: row.added_order,
     quantity: row.quantity ?? undefined,
     sourceUrl: row.source_url ?? undefined,
+    dropSource: row.drop_source ?? undefined,
     icon: row.icon ?? undefined,
     note: row.note ?? undefined,
     requirements: row.requirements,
@@ -173,6 +175,7 @@ function fromWishForInsert(wish: Wish) {
     added_order: wish.addedOrder,
     quantity: wish.quantity ?? null,
     source_url: wish.sourceUrl ?? null,
+    drop_source: wish.dropSource ?? null,
     icon: wish.icon ?? null,
     note: wish.note ?? null,
     requirements: wish.requirements ?? [],

@@ -146,6 +146,12 @@ export function ItemTooltip({
               {wish.note}
             </p>
           ) : null}
+          {wish.dropSource ? (
+            <p className="owner-note drop-source-note">
+              <span>Drops from</span>
+              {wish.dropSource}
+            </p>
+          ) : null}
           {wish.sourceUrl ? (
             <a href={wish.sourceUrl} target="_blank" rel="noreferrer">
               PoE2DB source

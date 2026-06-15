@@ -13,6 +13,7 @@ const draftDefaults: DraftWish = {
   gemFlavor: "skill",
   name: "",
   sourceUrl: "",
+  dropSource: "",
   quantity: "1",
   priority: "normal",
   note: "",
@@ -150,6 +151,14 @@ export function AddWishModal({
               value={draft.sourceUrl}
               onChange={(event) => update("sourceUrl", event.target.value)}
               placeholder="https://poe2db.tw/us/..."
+            />
+          </label>
+          <label className="wide-field">
+            Drop source
+            <input
+              value={draft.dropSource}
+              onChange={(event) => update("dropSource", event.target.value)}
+              placeholder="Drops from The Bodach, Ritual pinnacle boss"
             />
           </label>
           {showTablet ? (

@@ -263,8 +263,10 @@ export const wishes: Wish[] = [
     kind: "unique",
     priority: "normal",
     addedOrder: 8,
+    quantity: 2,
     icon: `${iconBase}sylvans-effigy.webp`,
     sourceUrl: "https://poe2db.tw/us/Sylvans_Effigy",
+    dropSource: "Drops from The Bodach, Ritual pinnacle boss",
     requirements: ["Requires Level 62, 7 Str, 12 Int"],
     properties: [{ label: "Spirit", value: "(50-75)% increased" }],
     explicitMods: [

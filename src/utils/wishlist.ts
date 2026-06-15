@@ -151,6 +151,7 @@ export function filterWishes(
       wish.name,
       wish.baseType,
       wish.kind,
+      wish.dropSource ?? "",
       owner?.accountName ?? "",
       wishBuild?.buildName ?? "",
       wishBuild?.characterName ?? "",
@@ -178,6 +179,10 @@ export function getWishCardTexts(wish: Wish): WishCardTextBlock[] {
 
   if (wish.note) {
     blocks.push({ label: "Comment", text: wish.note, tone: "note" });
+  }
+
+  if (wish.dropSource) {
+    blocks.push({ label: "Drops from", text: wish.dropSource, tone: "wanted" });
   }
 
   const mustHave = first(wish.mustHaveAffixes);
@@ -271,6 +276,7 @@ export function draftFromWish(wish: Wish): DraftWish {
     gemFlavor: wish.kind === "support" ? "support" : "skill",
     name: wish.name,
     sourceUrl: wish.sourceUrl ?? "",
+    dropSource: wish.dropSource ?? "",
     quantity: String(wish.quantity ?? 1),
     priority: wish.priority,
     note: wish.note ?? "",
@@ -292,6 +298,7 @@ export function applyDraftToWish(wish: Wish, draft: DraftWish): Wish {
     priority: draft.priority,
     quantity: getDraftQuantity(draft),
     sourceUrl: draft.sourceUrl.trim() || undefined,
+    dropSource: draft.dropSource.trim() || undefined,
     icon: nextIcon,
     note: draft.note.trim() || undefined,
     desiredMods: splitDraftLines(draft.desiredMods),
@@ -319,6 +326,7 @@ export function createWishFromDraft(
     addedOrder,
     quantity: getDraftQuantity(draft),
     sourceUrl: draft.sourceUrl.trim() || undefined,
+    dropSource: draft.dropSource.trim() || undefined,
     icon: getFallbackIcon(kind),
     note: draft.note.trim() || undefined,
     desiredMods: splitDraftLines(draft.desiredMods),

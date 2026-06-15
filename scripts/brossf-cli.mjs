@@ -7,7 +7,7 @@ BROSF wishlist CLI
 
 Usage:
   npm run brossf -- invite create --account "Сашенька" --initials "СА" [--token <token>] [--expires-at 2026-07-01T00:00:00Z] [--dry-run]
-  npm run brossf -- wish add --owner "Сашенька" --build "BIG MONKE" --name "Forgotten Warden" --kind unique [--poe2db URL] [--comment TEXT] [--priority high] [--quantity 1] [--dry-run]
+  npm run brossf -- wish add --owner "Сашенька" --build "BIG MONKE" --name "Forgotten Warden" --kind unique [--poe2db URL] [--drop-source TEXT] [--comment TEXT] [--priority high] [--quantity 1] [--dry-run]
   npm run brossf -- wish add-rare --owner "Сашенька" --build "BIG MONKE" --name "Dex/Spirit chest" --affix "+Spirit" --affix "+Maximum Life" [--comment TEXT] [--dry-run]
   npm run brossf -- claim add --wish <wish-id> --owner "Пашенька" [--dry-run]
   npm run brossf -- claim remove --wish <wish-id> --owner "Пашенька" [--dry-run]
@@ -191,6 +191,7 @@ async function addWish(flags, rare = false) {
       added_order: (count ?? 0) + 1,
       quantity: flags.quantity ? Number(flags.quantity) : null,
       source_url: flags.poe2db || flags.source || null,
+      drop_source: flags["drop-source"] || null,
       note: flags.comment || null,
       desired_mods: splitLines(flags.mods),
       must_have_affixes: rare ? affixes : splitLines(flags["must-have"]),

@@ -78,6 +78,7 @@ export interface Wish {
   addedOrder: number;
   quantity?: number;
   sourceUrl?: string;
+  dropSource?: string;
   icon?: string;
   note?: string;
   requirements?: string[];
@@ -99,6 +100,7 @@ export interface DraftWish {
   gemFlavor: "skill" | "support";
   name: string;
   sourceUrl: string;
+  dropSource: string;
   quantity: string;
   priority: WishPriority;
   note: string;
