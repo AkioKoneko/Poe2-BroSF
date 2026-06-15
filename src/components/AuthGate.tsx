@@ -23,10 +23,13 @@ export function AuthGate({
   onInvite,
   error: externalError,
 }: AuthGateProps) {
-  const [mode, setMode] = useState<AuthMode>("login");
+  const initialInviteToken = getInitialInviteToken();
+  const [mode, setMode] = useState<AuthMode>(
+    initialInviteToken ? "invite" : "login",
+  );
   const [accountName, setAccountName] = useState("Сашенька");
   const [password, setPassword] = useState("");
-  const [inviteToken, setInviteToken] = useState(getInitialInviteToken);
+  const [inviteToken, setInviteToken] = useState(initialInviteToken);
   const [error, setError] = useState("");
 
   const playerByName = useMemo(() => {
