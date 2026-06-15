@@ -1,5 +1,6 @@
 import { FormEvent, useState } from "react";
 import type { DraftWish, Wish, WishPriority } from "../types";
+import { syncPoe2dbItem } from "../lib/brossfRepository";
 import { draftFromWish } from "../utils/wishlist";
 
 interface AddWishModalProps {
@@ -12,14 +13,23 @@ const draftDefaults: DraftWish = {
   kind: "unique",
   gemFlavor: "skill",
   name: "",
+  baseType: "",
   sourceUrl: "",
   dropSource: "",
+  icon: "",
   quantity: "1",
   priority: "normal",
   note: "",
+  metaLines: "",
+  requirements: "",
+  properties: "",
+  descriptionLines: "",
+  explicitMods: "",
   desiredMods: "",
   mustHaveAffixes: "",
   niceAffixes: "",
+  flavourLines: "",
+  footerLine: "",
 };
 
 const kindTabs: { value: DraftWish["kind"]; label: string }[] = [
@@ -40,6 +50,8 @@ export function AddWishModal({
   const [draft, setDraft] = useState<DraftWish>(() =>
     initialWish ? draftFromWish(initialWish) : draftDefaults,
   );
+  const [syncing, setSyncing] = useState(false);
+  const [syncError, setSyncError] = useState("");
   const isEditing = Boolean(initialWish);
 
   function update<Key extends keyof DraftWish>(key: Key, value: DraftWish[Key]) {
@@ -49,6 +61,32 @@ export function AddWishModal({
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onSave(draft);
+  }
+
+  async function syncFromPoe2db() {
+    const sourceUrl = draft.sourceUrl.trim();
+    if (!sourceUrl) {
+      setSyncError("Paste a PoE2DB URL first.");
+      return;
+    }
+
+    try {
+      setSyncing(true);
+      setSyncError("");
+      const synced = await syncPoe2dbItem(sourceUrl);
+      setDraft((current) => ({
+        ...current,
+        ...synced,
+        sourceUrl: synced.sourceUrl ?? current.sourceUrl,
+        quantity: current.quantity || "1",
+        priority: current.priority,
+        note: current.note,
+      }));
+    } catch (error) {
+      setSyncError(error instanceof Error ? error.message : "PoE2DB sync failed.");
+    } finally {
+      setSyncing(false);
+    }
   }
 
   const showQuantity = draft.kind === "currency" || draft.kind === "tablet";
@@ -145,12 +183,31 @@ export function AddWishModal({
               />
             </label>
           ) : null}
-          <label className="wide-field">
-            PoE2DB URL
+          <label className="wide-field sync-field">
+            <span>PoE2DB URL</span>
+            <div className="sync-row">
+              <input
+                value={draft.sourceUrl}
+                onChange={(event) => update("sourceUrl", event.target.value)}
+                placeholder="https://poe2db.tw/us/..."
+              />
+              <button
+                className="ghost-button"
+                disabled={syncing}
+                onClick={syncFromPoe2db}
+                type="button"
+              >
+                {syncing ? "Syncing" : "Sync"}
+              </button>
+            </div>
+          </label>
+          {syncError ? <p className="form-error wide-field">{syncError}</p> : null}
+          <label>
+            Base type
             <input
-              value={draft.sourceUrl}
-              onChange={(event) => update("sourceUrl", event.target.value)}
-              placeholder="https://poe2db.tw/us/..."
+              value={draft.baseType}
+              onChange={(event) => update("baseType", event.target.value)}
+              placeholder="Stoic Sceptre"
             />
           </label>
           <label className="wide-field">

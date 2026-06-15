@@ -236,6 +236,25 @@ function splitDraftLines(value: string): string[] {
     .filter(Boolean);
 }
 
+function parseDraftProperties(value: string): Array<{ label: string; value: string }> {
+  return splitDraftLines(value).map((line) => {
+    const index = line.indexOf(":");
+    if (index === -1) return { label: line, value: "" };
+    return {
+      label: line.slice(0, index).trim(),
+      value: line.slice(index + 1).trim(),
+    };
+  });
+}
+
+function formatDraftProperties(properties: Wish["properties"]): string {
+  return (properties ?? [])
+    .map((property) =>
+      property.value ? `${property.label}: ${property.value}` : property.label,
+    )
+    .join("\n");
+}
+
 function getFallbackIcon(kind: WishKind): string | undefined {
   const iconBase = `${import.meta.env.BASE_URL}poe2db-icons/`;
   const fallbackIcon: Partial<Record<WishKind, string>> = {
@@ -261,6 +280,8 @@ function getDraftName(draft: DraftWish): string {
 }
 
 function getDraftBaseType(draft: DraftWish, kind: WishKind): string {
+  const syncedBaseType = draft.baseType.trim();
+  if (syncedBaseType) return syncedBaseType;
   if (draft.kind === "rare") return "Rare Template";
   if (draft.kind === "tablet") return "Precursor Tablet";
   if (draft.kind === "gem") {
@@ -275,14 +296,23 @@ export function draftFromWish(wish: Wish): DraftWish {
     kind: wish.kind === "support" ? "gem" : wish.kind,
     gemFlavor: wish.kind === "support" ? "support" : "skill",
     name: wish.name,
+    baseType: wish.baseType,
     sourceUrl: wish.sourceUrl ?? "",
     dropSource: wish.dropSource ?? "",
+    icon: wish.icon ?? "",
     quantity: String(wish.quantity ?? 1),
     priority: wish.priority,
     note: wish.note ?? "",
+    metaLines: (wish.metaLines ?? []).join("\n"),
+    requirements: (wish.requirements ?? []).join("\n"),
+    properties: formatDraftProperties(wish.properties),
+    descriptionLines: (wish.descriptionLines ?? []).join("\n"),
+    explicitMods: (wish.explicitMods ?? []).join("\n"),
     desiredMods: (wish.desiredMods ?? []).join("\n"),
     mustHaveAffixes: (wish.mustHaveAffixes ?? []).join("\n"),
     niceAffixes: (wish.niceAffixes ?? []).join("\n"),
+    flavourLines: (wish.flavourLines ?? []).join("\n"),
+    footerLine: wish.footerLine ?? "",
   };
 }
 
@@ -299,11 +329,18 @@ export function applyDraftToWish(wish: Wish, draft: DraftWish): Wish {
     quantity: getDraftQuantity(draft),
     sourceUrl: draft.sourceUrl.trim() || undefined,
     dropSource: draft.dropSource.trim() || undefined,
-    icon: nextIcon,
+    icon: draft.icon.trim() || nextIcon,
     note: draft.note.trim() || undefined,
+    metaLines: splitDraftLines(draft.metaLines),
+    requirements: splitDraftLines(draft.requirements),
+    properties: parseDraftProperties(draft.properties),
+    descriptionLines: splitDraftLines(draft.descriptionLines),
+    explicitMods: splitDraftLines(draft.explicitMods),
     desiredMods: splitDraftLines(draft.desiredMods),
     mustHaveAffixes: splitDraftLines(draft.mustHaveAffixes),
     niceAffixes: splitDraftLines(draft.niceAffixes),
+    flavourLines: splitDraftLines(draft.flavourLines),
+    footerLine: draft.footerLine.trim() || undefined,
   };
 }
 
@@ -327,10 +364,17 @@ export function createWishFromDraft(
     quantity: getDraftQuantity(draft),
     sourceUrl: draft.sourceUrl.trim() || undefined,
     dropSource: draft.dropSource.trim() || undefined,
-    icon: getFallbackIcon(kind),
+    icon: draft.icon.trim() || getFallbackIcon(kind),
     note: draft.note.trim() || undefined,
+    metaLines: splitDraftLines(draft.metaLines),
+    requirements: splitDraftLines(draft.requirements),
+    properties: parseDraftProperties(draft.properties),
+    descriptionLines: splitDraftLines(draft.descriptionLines),
+    explicitMods: splitDraftLines(draft.explicitMods),
     desiredMods: splitDraftLines(draft.desiredMods),
     mustHaveAffixes: splitDraftLines(draft.mustHaveAffixes),
     niceAffixes: splitDraftLines(draft.niceAffixes),
+    flavourLines: splitDraftLines(draft.flavourLines),
+    footerLine: draft.footerLine.trim() || undefined,
   };
 }

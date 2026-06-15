@@ -66,6 +66,24 @@ export interface BoardData {
   claims: ClaimState;
 }
 
+export type Poe2dbSyncResult = Partial<
+  Pick<
+    DraftWish,
+    | "kind"
+    | "name"
+    | "baseType"
+    | "sourceUrl"
+    | "dropSource"
+    | "icon"
+    | "metaLines"
+    | "requirements"
+    | "properties"
+    | "descriptionLines"
+    | "explicitMods"
+    | "flavourLines"
+  >
+>;
+
 function assertNoError(error: { message: string } | null, action: string): void {
   if (error) throw new Error(`${action}: ${error.message}`);
 }
@@ -223,6 +241,52 @@ export async function redeemInvite(
 export async function signOutOfSupabase(): Promise<void> {
   const { error } = await getSupabaseClient().auth.signOut();
   assertNoError(error, "Sign out failed");
+}
+
+export async function syncPoe2dbItem(sourceUrl: string): Promise<Poe2dbSyncResult> {
+  const { data, error } = await getSupabaseClient().functions.invoke(
+    "sync-poe2db-item",
+    {
+      body: { url: sourceUrl },
+    },
+  );
+  assertNoError(error, "PoE2DB sync failed");
+
+  const synced = data as {
+    kind?: DraftWish["kind"] | "support";
+    name?: string;
+    baseType?: string;
+    sourceUrl?: string;
+    dropSource?: string;
+    icon?: string;
+    metaLines?: string[];
+    requirements?: string[];
+    properties?: Array<{ label: string; value: string }>;
+    descriptionLines?: string[];
+    explicitMods?: string[];
+    flavourLines?: string[];
+  } | null;
+
+  if (!synced?.name) throw new Error("PoE2DB sync returned no item name.");
+
+  return {
+    kind: synced.kind === "support" ? "gem" : synced.kind,
+    name: synced.name,
+    baseType: synced.baseType ?? "",
+    sourceUrl: synced.sourceUrl ?? sourceUrl,
+    dropSource: synced.dropSource ?? "",
+    icon: synced.icon ?? "",
+    metaLines: (synced.metaLines ?? []).join("\n"),
+    requirements: (synced.requirements ?? []).join("\n"),
+    properties: (synced.properties ?? [])
+      .map((property) =>
+        property.value ? `${property.label}: ${property.value}` : property.label,
+      )
+      .join("\n"),
+    descriptionLines: (synced.descriptionLines ?? []).join("\n"),
+    explicitMods: (synced.explicitMods ?? []).join("\n"),
+    flavourLines: (synced.flavourLines ?? []).join("\n"),
+  };
 }
 
 export async function loadBoardData(): Promise<BoardData> {

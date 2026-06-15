@@ -1183,6 +1183,21 @@ label span {
   grid-column: 1 / -1;
 }
 
+.sync-field {
+  gap: 7px;
+}
+
+.sync-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px;
+  gap: 8px;
+}
+
+.sync-row .ghost-button {
+  min-height: 38px;
+  white-space: nowrap;
+}
+
 .profile-account,
 .build-editor {
   display: grid;

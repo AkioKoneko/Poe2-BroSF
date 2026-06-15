@@ -99,12 +99,21 @@ export interface DraftWish {
   kind: "unique" | "currency" | "tablet" | "gem" | "rare";
   gemFlavor: "skill" | "support";
   name: string;
+  baseType: string;
   sourceUrl: string;
   dropSource: string;
+  icon: string;
   quantity: string;
   priority: WishPriority;
   note: string;
+  metaLines: string;
+  requirements: string;
+  properties: string;
+  descriptionLines: string;
+  explicitMods: string;
   desiredMods: string;
   mustHaveAffixes: string;
   niceAffixes: string;
+  flavourLines: string;
+  footerLine: string;
 }
