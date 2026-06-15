@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, MouseEvent, useRef, useState } from "react";
 import type { AscendancyOption, BuildProfile, Player } from "../types";
 
 interface ProfileModalProps {
@@ -16,6 +16,7 @@ export function ProfileModal({
 }: ProfileModalProps) {
   const [builds, setBuilds] = useState<BuildProfile[]>(player.builds);
   const [activeBuildId, setActiveBuildId] = useState(player.activeBuildId);
+  const backdropPointerStarted = useRef(false);
   const selectedBuild =
     builds.find((build) => build.id === activeBuildId) ?? builds[0];
   const selectedAscendancy = ascendancies.find(
@@ -63,7 +64,19 @@ export function ProfileModal({
   }
 
   return (
-    <div className="modal-backdrop" role="presentation" onClick={onClose}>
+    <div
+      className="modal-backdrop"
+      role="presentation"
+      onMouseDown={(event: MouseEvent<HTMLDivElement>) => {
+        backdropPointerStarted.current = event.target === event.currentTarget;
+      }}
+      onClick={(event) => {
+        if (backdropPointerStarted.current && event.target === event.currentTarget) {
+          onClose();
+        }
+        backdropPointerStarted.current = false;
+      }}
+    >
       <form
         className="profile-modal"
         role="dialog"

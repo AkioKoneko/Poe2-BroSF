@@ -55,7 +55,8 @@ export function Roster({
             <span className="roster-copy">
               <strong>{player.accountName}</strong>
               <small>
-                {build.buildName} / {ascendancy?.name ?? "Unknown"}
+                <span>{build.buildName}</span>
+                <span>{ascendancy?.name ?? "Unknown"}</span>
               </small>
             </span>
             <span className="roster-count">{counts.get(build.id) ?? 0}</span>

@@ -324,6 +324,8 @@ export const wishes: Wish[] = [
     kind: "unique",
     priority: "normal",
     addedOrder: 14,
+    icon:
+      "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvT2ZmaGFuZC9TaGllbGRzL1VuaXF1ZXMvRHVua2VsaGFsdCIsInciOjIsImgiOjIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d87b0f268f/Dunkelhalt.png",
     sourceUrl: "https://poe2db.tw/us/Dunkelhalt",
     note: "Buckler для defensive set 2 / Parry setup.",
     metaLines: ["Ezomyte Bucklers"],

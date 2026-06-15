@@ -52,6 +52,14 @@ function metaContent(html: string, property: string): string {
   return decodeHtml(matchFirst(html, pattern));
 }
 
+function parseEmbeddedIcon(html: string): string {
+  const icon = matchFirst(
+    html,
+    /"icon":\s*"(https:\/\/web\.poecdn\.com\/gen\/image\/[^"]+)"/i,
+  );
+  return decodeHtml(icon.replace(/\\\//g, "/"));
+}
+
 function normalizePoe2dbUrl(input: string): string {
   const url = new URL(input);
   if (!["poe2db.tw", "www.poe2db.tw"].includes(url.hostname)) {
@@ -192,7 +200,7 @@ Deno.serve(async (req: Request) => {
     .map((line) => line.trim())
     .filter(Boolean)
     .filter((line) => !/art variation/i.test(line));
-  const icon = metaContent(html, "og:image") || matchFirst(
+  const icon = parseEmbeddedIcon(html) || metaContent(html, "og:image") || matchFirst(
     html,
     /<div class="itemboximage">[\s\S]*?<img[^>]+src=["']([^"']+)["']/i,
   );

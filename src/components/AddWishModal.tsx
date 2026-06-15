@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, MouseEvent, useRef, useState } from "react";
 import type { DraftWish, Wish, WishPriority } from "../types";
 import { syncPoe2dbItem } from "../lib/brossfRepository";
 import { draftFromWish } from "../utils/wishlist";
@@ -53,6 +53,7 @@ export function AddWishModal({
   );
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState("");
+  const backdropPointerStarted = useRef(false);
   const isEditing = Boolean(initialWish);
 
   function update<Key extends keyof DraftWish>(key: Key, value: DraftWish[Key]) {
@@ -96,7 +97,19 @@ export function AddWishModal({
   const showTablet = draft.kind === "tablet";
 
   return (
-    <div className="modal-backdrop" role="presentation" onClick={onClose}>
+    <div
+      className="modal-backdrop"
+      role="presentation"
+      onMouseDown={(event: MouseEvent<HTMLDivElement>) => {
+        backdropPointerStarted.current = event.target === event.currentTarget;
+      }}
+      onClick={(event) => {
+        if (backdropPointerStarted.current && event.target === event.currentTarget) {
+          onClose();
+        }
+        backdropPointerStarted.current = false;
+      }}
+    >
       <form
         className="add-modal"
         role="dialog"

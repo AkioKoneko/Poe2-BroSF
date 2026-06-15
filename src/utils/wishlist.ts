@@ -176,6 +176,7 @@ export interface WishCardTextBlock {
 
 export function getWishCardTexts(wish: Wish): WishCardTextBlock[] {
   const first = (lines?: string[]) => lines?.find(Boolean);
+  const packContents = (lines?: string[]) => lines?.filter(Boolean).join(", ");
   const blocks: WishCardTextBlock[] = [];
 
   if (wish.note) {
@@ -187,7 +188,8 @@ export function getWishCardTexts(wish: Wish): WishCardTextBlock[] {
   }
 
   const mustHave = first(wish.mustHaveAffixes);
-  const desired = first(wish.desiredMods);
+  const desired =
+    wish.kind === "pack" ? packContents(wish.desiredMods) : first(wish.desiredMods);
   const nice = first(wish.niceAffixes);
 
   if (mustHave) {

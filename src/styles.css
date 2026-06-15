@@ -526,10 +526,18 @@ label span {
 }
 
 .roster-copy small {
-  overflow: hidden;
+  display: grid;
+  gap: 1px;
+  overflow: visible;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.4;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.roster-copy small span {
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -759,6 +767,10 @@ label span {
   line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.rarity-pack .card-text p {
+  -webkit-line-clamp: 4;
 }
 
 .card-text-poe p,

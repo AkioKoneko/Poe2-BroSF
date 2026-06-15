@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { MouseEvent, useEffect, useRef } from "react";
 import type { ClaimState, Player, UserId, Wish } from "../types";
 import { isClaimedBy } from "../utils/wishlist";
 import { ItemTooltip } from "./ItemTooltip";
@@ -28,6 +28,7 @@ export function DetailModal({
 }: DetailModalProps) {
   const isOwner = wish.ownerId === currentUserId;
   const claimedByMe = isClaimedBy(claims, wish.id, currentUserId);
+  const backdropPointerStarted = useRef(false);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -41,7 +42,19 @@ export function DetailModal({
   }, [onClose]);
 
   return (
-    <div className="modal-backdrop" role="presentation" onClick={onClose}>
+    <div
+      className="modal-backdrop"
+      role="presentation"
+      onMouseDown={(event: MouseEvent<HTMLDivElement>) => {
+        backdropPointerStarted.current = event.target === event.currentTarget;
+      }}
+      onClick={(event) => {
+        if (backdropPointerStarted.current && event.target === event.currentTarget) {
+          onClose();
+        }
+        backdropPointerStarted.current = false;
+      }}
+    >
       <div
         className="detail-modal"
         role="dialog"
