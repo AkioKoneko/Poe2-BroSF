@@ -20,7 +20,6 @@ interface WishCardProps {
   owner: Player;
   claims: ClaimState;
   currentUserId: UserId;
-  playersById: Map<UserId, Player>;
   ascendanciesById: Map<AscendancyId, AscendancyOption>;
   onOpen: (wishId: string) => void;
   onHover: (wishId: string, clientX: number, clientY: number) => void;
@@ -34,7 +33,6 @@ export function WishCard({
   owner,
   claims,
   currentUserId,
-  playersById,
   ascendanciesById,
   onOpen,
   onHover,
@@ -45,13 +43,7 @@ export function WishCard({
   const isOwner = wish.ownerId === currentUserId;
   const claimers = getClaimers(claims, wish.id);
   const claimedByMe = isClaimedBy(claims, wish.id, currentUserId);
-  const fulfilledBy = wish.fulfilledBy
-    ? playersById.get(wish.fulfilledBy)?.accountName ?? wish.fulfilledBy
-    : "";
   const firstClaimerId = claimers[0];
-  const firstClaimer = firstClaimerId
-    ? playersById.get(firstClaimerId)?.accountName ?? firstClaimerId
-    : "";
   const ownerBuild = getWishBuild(wish, owner);
   const ownerAscendancy = ascendanciesById.get(ownerBuild.ascendancyId);
   const cardTexts = getWishCardTexts(wish);
@@ -94,14 +86,22 @@ export function WishCard({
             <small>{placeholder.subtitle}</small>
           </div>
         )}
-        <span className={`priority-rune priority-${wish.priority}`}>
-          {priorityLabel[wish.priority]}
+        <span
+          className={[
+            "priority-rune",
+            wish.fulfilledAt
+              ? "status-rune status-fulfilled"
+              : claimers.length
+                ? "status-rune status-claimed"
+                : `priority-${wish.priority}`,
+          ].join(" ")}
+        >
+          {wish.fulfilledAt
+            ? "ЗАБРАНО"
+            : claimers.length
+              ? "В ГИЛЬДЕ"
+              : priorityLabel[wish.priority]}
         </span>
-        {wish.fulfilledAt ? (
-          <span className="availability-ribbon fulfilled">ЗАБРАНО: {fulfilledBy}</span>
-        ) : claimers.length ? (
-          <span className="availability-ribbon">В ГИЛЬДЕ: {firstClaimer}</span>
-        ) : null}
       </div>
       <div className="card-body">
         <div className="card-kicker">
@@ -134,20 +134,12 @@ export function WishCard({
           </span>
         </span>
 
-        {claimers.length ? (
-          <span className={wish.fulfilledAt ? "claimers fulfilled" : "claimers"}>
-            {wish.fulfilledAt
-              ? `Забрано: ${fulfilledBy}`
-              : claimers.map((id) => playersById.get(id)?.accountName ?? id).join(", ")}
-          </span>
-        ) : (
+        {!wish.fulfilledAt && !claimers.length ? (
           <span className="unclaimed">No claim</span>
-        )}
+        ) : <span className="claim-spacer" aria-hidden="true" />}
 
         <div className="card-actions">
-          {wish.fulfilledAt ? (
-            <span className="fulfilled-mark">ЗАБРАНО</span>
-          ) : isOwner && firstClaimerId ? (
+          {wish.fulfilledAt ? null : isOwner && firstClaimerId ? (
             <button
               className="take-button"
               type="button"

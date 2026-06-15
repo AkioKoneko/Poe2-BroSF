@@ -77,6 +77,7 @@ export default function App() {
   const [addOpen, setAddOpen] = useState(false);
   const [editingWishId, setEditingWishId] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [donorBoardOpen, setDonorBoardOpen] = useState(false);
 
   const playersById = useMemo(() => buildPlayerMap(playerList), [playerList]);
   const ascendanciesById = useMemo(
@@ -394,13 +395,26 @@ export default function App() {
             onToggleBuild={toggleBuildFilter}
             onClearBuilds={() => setActiveBuildIds([])}
           />
-          <DonorStats players={playerList} donationCounts={donationCounts} />
-          <BoardControls
-            search={search}
-            sort={sortMode}
-            onSearch={setSearch}
-            onSort={setSortMode}
-          />
+          <div className="board-tools">
+            <div className="donor-toggle-row">
+              <button
+                className="ghost-button donor-toggle"
+                onClick={() => setDonorBoardOpen((open) => !open)}
+                type="button"
+              >
+                {donorBoardOpen ? "Hide donor board" : "Donor board"}
+              </button>
+            </div>
+            {donorBoardOpen ? (
+              <DonorStats players={playerList} donationCounts={donationCounts} />
+            ) : null}
+            <BoardControls
+              search={search}
+              sort={sortMode}
+              onSearch={setSearch}
+              onSort={setSortMode}
+            />
+          </div>
 
           <div className="showcase-scroll">
             {openWishes.length ? (
@@ -414,7 +428,6 @@ export default function App() {
                       owner={owner}
                       claims={claims}
                       currentUserId={currentPlayer.id}
-                      playersById={playersById}
                       ascendanciesById={ascendanciesById}
                       onOpen={setDetailId}
                       onHover={(id, x, y) => setHover({ id, x, y })}
@@ -447,7 +460,6 @@ export default function App() {
                         owner={owner}
                         claims={claims}
                         currentUserId={currentPlayer.id}
-                        playersById={playersById}
                         ascendanciesById={ascendanciesById}
                         onOpen={setDetailId}
                         onHover={(id, x, y) => setHover({ id, x, y })}
