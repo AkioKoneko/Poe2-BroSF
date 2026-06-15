@@ -88,6 +88,18 @@ function assertNoError(error: { message: string } | null, action: string): void 
   if (error) throw new Error(`${action}: ${error.message}`);
 }
 
+async function getFunctionErrorMessage(error: { message: string; context?: unknown }): Promise<string> {
+  const context = error.context;
+  if (context instanceof Response) {
+    const body = await context
+      .clone()
+      .json()
+      .catch(() => null) as { error?: string } | null;
+    if (body?.error) return body.error;
+  }
+  return error.message;
+}
+
 function asKind(value: string): WishKind {
   if (
     value === "unique" ||
@@ -250,7 +262,9 @@ export async function syncPoe2dbItem(sourceUrl: string): Promise<Poe2dbSyncResul
       body: { url: sourceUrl },
     },
   );
-  assertNoError(error, "PoE2DB sync failed");
+  if (error) {
+    throw new Error(`PoE2DB sync failed: ${await getFunctionErrorMessage(error)}`);
+  }
 
   const synced = data as {
     kind?: DraftWish["kind"] | "support";

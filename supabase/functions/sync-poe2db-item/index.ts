@@ -77,7 +77,7 @@ function parseKind(html: string): string {
 function parseItemPopup(html: string): string {
   return matchFirst(
     html,
-    /<div class="newItemPopup[\s\S]*?<div class="itemboximage">/i,
+    /(<div class="newItemPopup[\s\S]*?)<div class="itemboximage">/i,
   );
 }
 
