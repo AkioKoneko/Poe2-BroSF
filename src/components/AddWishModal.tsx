@@ -83,14 +83,29 @@ export function AddWishModal({
       setSyncing(true);
       setSyncError("");
       const synced = await syncPoe2dbItem(sourceUrl);
-      setDraft((current) => ({
-        ...current,
-        ...synced,
-        sourceUrl: synced.sourceUrl ?? current.sourceUrl,
-        quantity: current.quantity || "1",
-        priority: current.priority,
-        note: current.note,
-      }));
+      setDraft((current) => {
+        const next = {
+          ...current,
+          ...synced,
+          sourceUrl: synced.sourceUrl ?? current.sourceUrl,
+          dropSource: synced.dropSource || current.dropSource,
+          icon: synced.icon || current.icon,
+          quantity: current.quantity || "1",
+          priority: current.priority,
+          note: current.note,
+        };
+
+        if (current.kind !== "rare") return next;
+
+        return {
+          ...next,
+          kind: "rare",
+          name: current.name || synced.name || next.name,
+          baseType: synced.name || synced.baseType || current.baseType,
+          mustHaveAffixes: current.mustHaveAffixes,
+          niceAffixes: current.niceAffixes,
+        };
+      });
     } catch (error) {
       setSyncError(error instanceof Error ? error.message : "PoE2DB sync failed.");
     } finally {

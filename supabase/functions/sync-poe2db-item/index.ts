@@ -61,15 +61,34 @@ function parseEmbeddedIcon(html: string): string {
 }
 
 function normalizePoe2dbUrl(input: string): string {
-  const url = new URL(input);
+  const url = new URL(/^https?:\/\//i.test(input) ? input : `https://${input}`);
   if (!["poe2db.tw", "www.poe2db.tw"].includes(url.hostname)) {
     throw new Error("Only poe2db.tw URLs can be synced.");
   }
 
-  if (!url.pathname.startsWith("/us/")) {
-    throw new Error("Use the English PoE2DB URL, for example https://poe2db.tw/us/Sylvans_Effigy.");
+  const localeCodes = new Set([
+    "br",
+    "cn",
+    "de",
+    "es",
+    "fr",
+    "jp",
+    "kr",
+    "ru",
+    "th",
+    "tw",
+    "us",
+  ]);
+  const pathParts = url.pathname.split("/").filter(Boolean);
+  if (pathParts[0] === "us") {
+    // already normalized
+  } else if (pathParts[0] && localeCodes.has(pathParts[0])) {
+    pathParts[0] = "us";
+  } else {
+    pathParts.unshift("us");
   }
 
+  url.pathname = `/${pathParts.join("/")}`;
   url.hash = "";
   return url.toString();
 }
